@@ -1,0 +1,37 @@
+﻿@page "/itemdetails/{Name}"
+
+@using ShattuckProject2.Models
+@using ShattuckProject2.Services
+@inject GameDataService GameData
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+
+    private Item item;
+
+    protected override void OnInitialized()
+    {
+        item = GameData.Items.FirstOrDefault(i => i.Name == Name);
+    }
+}
+
+@*Displays the clicked item ad its details on its own Item Details page*@
+@if (item != null)
+{
+    <h3>@item.Name</h3>
+    <img src="@item.ImageUrl" alt="@item.Name" />
+    <p>@item.Description</p>
+
+    <h4>Stats</h4>
+    <ul>
+        @foreach (var stat in item.Stats)
+        {
+            <li>@stat.Key: @stat.Value</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Item not found!</p>
+}

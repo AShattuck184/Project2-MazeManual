@@ -1,0 +1,24 @@
+﻿@page "/items"
+
+@using ShattuckProject2.Services
+@inject GameDataService GameData
+
+<PageTitle>Items</PageTitle>
+
+<h1>Items</h1><br/>
+
+@*Lists each of the items and attaches a link for the user to click to see the items' details*@
+@foreach (var group in GameData.Items.GroupBy(i => i.Type))
+{
+    <h3>@group.Key</h3> @* Displays the type (e.g., Weapon, Potion) *@
+
+    <ul>
+        @foreach (var item in group)
+        {
+            <li>
+                @* Link to the details page using the item's name as a route parameter *@
+                <a href="/itemdetails/@item.Name">@item.Name</a>
+            </li>
+        }
+    </ul>
+}

@@ -1,0 +1,24 @@
+﻿@page "/characters"
+
+@using ShattuckProject2.Services
+@inject GameDataService GameData
+
+<PageTitle>Maze Characters</PageTitle>
+
+<h1>Characters</h1><br/>
+
+@*Lists each of the characters and attaches a link for the user to click to see the characters' details*@
+@foreach (var group in GameData.Characters.GroupBy(c => c.Type))
+{
+    <h3>@group.Key</h3> @* Displays the type (Player, Monster, etc.) *@
+
+    <ul>
+        @foreach (var character in group)
+        {
+            <li>
+                @* Link to the details page using the character's name as a route parameter *@
+                <a href="/characterdetails/@character.Name">@character.Name</a>
+            </li>
+        }
+    </ul>
+}

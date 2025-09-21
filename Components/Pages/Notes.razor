@@ -1,0 +1,103 @@
+﻿@page "/notes"
+
+@using ShattuckProject2.Services
+@inject NotesService NotesService
+@inject GameDataService GameData
+
+<h1>Notes</h1>
+
+@if (NotesService.Notes.Any())
+{
+    @foreach (var note in NotesService.Notes)
+    {
+        <div class="note">
+            <textarea @bind="note.Content"></textarea>
+            <button @onclick="() => DeleteNote(note)">Delete</button>
+
+            <h4>References</h4>
+            <ul>
+                @foreach (var reference in note.References)
+                {
+                    <li>
+                        <a href="@GetReferenceLink(reference)">@reference</a>
+                        <button @onclick="() => RemoveReference(note, reference)">Remove</button>
+                    </li>
+                }
+            </ul>
+
+            <select @bind="selectedReference">
+                <option disabled selected value>Select reference</option>
+                <optgroup label="Characters">
+                    @foreach (var character in GameData.Characters)
+                    {
+                        <option value="@character.Name">@character.Name</option>
+                    }
+                </optgroup>
+                <optgroup label="Items">
+                    @foreach (var item in GameData.Items)
+                    {
+                        <option value="@item.Name">@item.Name</option>
+                    }
+                </optgroup>
+            </select>
+
+            <button @onclick="() => AddReference(note)">Add Reference</button>
+        </div>
+    }
+}
+else
+{
+    <p>No notes are currently available. Add a note below.</p>
+}
+
+<h2>Add a New Note</h2>
+<textarea @bind="newNoteContent"></textarea>
+<button @onclick="AddNote">Add Note</button>
+
+@code {
+    private string newNoteContent = "";
+    private string selectedReference = "";
+
+    private void AddNote()
+    {
+        if (!string.IsNullOrEmpty(newNoteContent))
+        {
+            NotesService.AddNote(new Note { Content = newNoteContent });
+            newNoteContent = "";
+        }
+    }
+
+    private void DeleteNote(Note note)
+    {
+        NotesService.DeleteNote(note);
+    }
+
+    private void AddReference(Note note)
+    {
+        if (!string.IsNullOrEmpty(selectedReference) && !note.References.Contains(selectedReference))
+        {
+            note.References.Add(selectedReference);
+        }
+        selectedReference = "";
+    }
+
+    private void RemoveReference(Note note, string reference)
+    {
+        note.References.Remove(reference);
+    }
+
+    private string GetReferenceLink(string reference)
+    {
+        var character = GameData.Characters.FirstOrDefault(c => c.Name == reference);
+        if (character != null)
+        {
+            return $"/characterdetails/{reference}";
+        }
+        var item = GameData.Items.FirstOrDefault(i => i.Name == reference);
+        if (item != null)
+        {
+            return $"/itemdetails/{reference}";
+        }
+        return "#"; // Default if reference not found
+    }
+}

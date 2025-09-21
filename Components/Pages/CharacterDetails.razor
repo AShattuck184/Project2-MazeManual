@@ -1,0 +1,39 @@
+﻿@page "/characterdetails/{Name}"
+
+@using ShattuckProject2.Models
+@using ShattuckProject2.Services
+@inject GameDataService GameData
+
+<h4>Character Details</h4>
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+
+    private Character character;
+
+    protected override void OnInitialized()
+    {
+        character = GameData.Characters.FirstOrDefault(c => c.Name == Name);
+    }
+}
+
+@*Displays the clicked character and its details on its own Character Details page*@
+@if (character != null)
+{
+    <h3>@character.Name</h3>
+    <img src="@character.ImageUrl" alt="@character.Name" />
+    <p>@character.Description</p>
+
+    <h4>Stats</h4>
+        <ul>
+            @foreach (var stat in character.Stats)
+            {
+                <li>@stat.Key: @stat.Value</li>
+            }
+        </ul>
+}
+else
+{
+    <p>Character not found!</p>
+}
